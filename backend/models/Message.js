@@ -55,6 +55,22 @@ const messageSchema = new mongoose.Schema({
   webhook_data: {
     type: mongoose.Schema.Types.Mixed,
     default: {}
+  },
+  webhook_metadata: {
+    payload_type: String,
+    gs_app_id: String,
+    phone_number_id: String,
+    display_phone_number: String,
+    conversation_id: String,
+    conversation_origin: String,
+    conversation_expiration: String,
+    pricing: {
+      billable: Boolean,
+      category: String,
+      pricing_model: String,
+      type: String
+    },
+    gs_id: String
   }
 }, {
   timestamps: true,
@@ -65,5 +81,6 @@ const messageSchema = new mongoose.Schema({
 messageSchema.index({ wa_id: 1, timestamp: -1 });
 messageSchema.index({ id: 1 });
 messageSchema.index({ meta_msg_id: 1 });
+messageSchema.index({ 'webhook_metadata.gs_app_id': 1 });
 
 module.exports = mongoose.model('Message', messageSchema);

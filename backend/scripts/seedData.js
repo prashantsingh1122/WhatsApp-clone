@@ -108,54 +108,70 @@ const processWebhookPayload = async (webhookData) => {
   const messages = [];
   
   try {
-    if (webhookData.entry) {
-      webhookData.entry.forEach(entry => {
-        if (entry.changes) {
-          entry.changes.forEach(change => {
-            if (change.value && change.value.messages) {
-              change.value.messages.forEach(msg => {
-                // Find contact info
-                const contact = change.value.contacts?.find(c => c.wa_id === msg.from);
-                const contactName = contact?.profile?.name || msg.from;
-                
-                const messageData = {
-                  id: msg.id,
-                  meta_msg_id: msg.id,
-                  wa_id: msg.from,
-                  phone_number: msg.from,
-                  contact_name: contactName,
-                  message_type: msg.type || 'text',
-                  message_body: msg.text?.body || msg.caption || '',
-                  message_url: msg.image?.link || msg.document?.link || msg.audio?.link || '',
-                  timestamp: new Date(parseInt(msg.timestamp) * 1000),
-                  status: 'delivered',
-                  direction: 'inbound',
-                  webhook_data: webhookData
-                };
-                messages.push(messageData);
-              });
-            }
-            
-            // Handle status updates
-            if (change.value && change.value.statuses) {
-              change.value.statuses.forEach(status => {
-                const messageData = {
-                  id: status.id,
-                  meta_msg_id: status.id,
-                  status: status.status,
-                  wa_id: status.recipient_id,
-                  phone_number: status.recipient_id,
-                  timestamp: new Date(parseInt(status.timestamp) * 1000),
-                  direction: 'outbound',
-                  webhook_data: webhookData
-                };
-                messages.push(messageData);
-              });
-            }
-          });
-        }
-      });
-    }
+    // Handle the real WhatsApp webhook structure
+    const entries = webhookData.metaData?.entry || webhookData.entry || [];
+    
+    entries.forEach(entry => {
+      if (entry.changes) {
+        entry.changes.forEach(change => {
+          if (change.value && change.value.messages) {
+            change.value.messages.forEach(msg => {
+              // Find contact info
+              const contact = change.value.contacts?.find(c => c.wa_id === msg.from);
+              const contactName = contact?.profile?.name || msg.from;
+              
+              const messageData = {
+                id: msg.id,
+                meta_msg_id: msg.id,
+                wa_id: msg.from,
+                phone_number: msg.from,
+                contact_name: contactName,
+                message_type: msg.type || 'text',
+                message_body: msg.text?.body || msg.caption || '',
+                message_url: msg.image?.link || msg.document?.link || msg.audio?.link || '',
+                timestamp: new Date(parseInt(msg.timestamp) * 1000),
+                status: 'delivered',
+                direction: 'inbound',
+                webhook_data: webhookData,
+                webhook_metadata: {
+                  payload_type: webhookData.payload_type,
+                  gs_app_id: webhookData.gs_app_id,
+                  phone_number_id: change.value.metadata?.phone_number_id,
+                  display_phone_number: change.value.metadata?.display_phone_number
+                }
+              };
+              messages.push(messageData);
+            });
+          }
+          
+          // Handle status updates with the real structure
+          if (change.value && change.value.statuses) {
+            change.value.statuses.forEach(status => {
+              const messageData = {
+                id: status.id,
+                meta_msg_id: status.meta_msg_id || status.id,
+                status: status.status,
+                wa_id: status.recipient_id,
+                phone_number: status.recipient_id,
+                timestamp: new Date(parseInt(status.timestamp) * 1000),
+                direction: 'outbound',
+                webhook_data: webhookData,
+                webhook_metadata: {
+                  payload_type: webhookData.payload_type,
+                  gs_app_id: webhookData.gs_app_id,
+                  conversation_id: status.conversation?.id,
+                  conversation_origin: status.conversation?.origin?.type,
+                  conversation_expiration: status.conversation?.expiration_timestamp,
+                  pricing: status.pricing,
+                  gs_id: status.gs_id
+                }
+              };
+              messages.push(messageData);
+            });
+          }
+        });
+      }
+    });
   } catch (error) {
     console.error('Error processing webhook:', error);
   }
@@ -262,7 +278,50 @@ const seedFromJsonFiles = async (directory) => {
       console.log('Creating sample data directory and files...');
       fs.mkdirSync(directory, { recursive: true });
       
-      // Create sample JSON files
+      // Create sample JSON files based on the real payloads
+      const samplePayloads = [
+        {
+          "payload_type": "whatsapp_webhook",
+          "_id": "conv1-msg1-user",
+          "metaData": {
+            "entry": [{
+              "id": "30164062719905277",
+              "changes": [{
+                "field": "messages",
+                "value": {
+                  "messaging_product": "whatsapp",
+                  "metadata": {
+                    "display_phone_number": "918329446654",
+                    "phone_number_id": "629305560276479"
+                  },
+                  "contacts": [{
+                    "profile": {
+                      "name": "John Doe"
+                    },
+                    "wa_id": "1234567890"
+                  }],
+                  "messages": [{
+                    "from": "1234567890",
+                    "id": "wamid.HBgNMTIzNDU2Nzg5MAoSFQogZmFrZV9pZF8xMjM0NTY3ODkwFAMSBk1FU1NBR0UAAA",
+                    "timestamp": "1699123200",
+                    "text": {
+                      "body": "Hello! This is a test message from John."
+                    },
+                    "type": "text"
+                  }]
+                }
+              }]
+            }],
+            "gs_app_id": "conv1-app",
+            "object": "whatsapp_business_account"
+          },
+          "createdAt": "2025-08-06 12:00:00",
+          "startedAt": "2025-08-06 12:00:00",
+          "completedAt": "2025-08-06 12:00:01",
+          "executed": true
+        }
+      ];
+      
       samplePayloads.forEach((payload, index) => {
         fs.writeFileSync(
           path.join(directory, `sample_payload_${index + 1}.json`),

@@ -86,6 +86,13 @@ class SocketService {
     }
   }
 
+  // Emit typing event
+  emit(event, data) {
+    if (this.socket?.connected) {
+      this.socket.emit(event, data);
+    }
+  }
+
   // Generic event listener
   on(event, callback) {
     if (this.socket) {

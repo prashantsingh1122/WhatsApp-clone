@@ -27,6 +27,11 @@ const contactSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  last_message_type: {
+    type: String,
+    enum: ['text', 'image', 'document', 'audio', 'video', 'location', 'contact'],
+    default: 'text'
+  },
   unread_count: {
     type: Number,
     default: 0

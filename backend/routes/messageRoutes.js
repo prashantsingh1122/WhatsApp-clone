@@ -39,4 +39,38 @@ router.post('/messages', sendMessage);
 // Update message status
 router.put('/messages/:messageId/status', updateMessageStatus);
 
+// Test endpoint to simulate real webhook payloads
+router.post('/test-webhook', async (req, res) => {
+  try {
+    const { payloadFile } = req.body;
+    
+    if (!payloadFile) {
+      return res.status(400).json({ error: 'payloadFile is required' });
+    }
+    
+    const fs = require('fs');
+    const path = require('path');
+    const filePath = path.join(__dirname, '..', 'scripts', payloadFile);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'Payload file not found' });
+    }
+    
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const payload = JSON.parse(fileContent);
+    
+    // Process the webhook payload
+    const result = await processWebhook(req, res);
+    
+    res.json({
+      success: true,
+      message: `Processed ${payloadFile}`,
+      result
+    });
+  } catch (error) {
+    console.error('Test webhook error:', error);
+    res.status(500).json({ error: 'Failed to process test webhook' });
+  }
+});
+
 module.exports = router;

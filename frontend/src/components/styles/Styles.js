@@ -187,6 +187,18 @@ export const UnreadBadge = styled.div`
   display: ${props => props.count > 0 ? 'block' : 'none'};
 `;
 
+// Online indicator
+export const OnlineIndicator = styled.div`
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background-color: ${colors.secondary};
+  border: 2px solid ${colors.sidebarBackground};
+  border-radius: 50%;
+`;
+
 // Main chat area
 export const ChatArea = styled.div`
   flex: 1;
@@ -328,6 +340,135 @@ export const MessageStatus = styled.span`
         default: return '""';
       }
     }};
+  }
+`;
+
+// Message image
+export const MessageImage = styled.img`
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+// Message document
+export const MessageDocument = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background-color: ${colors.messageBackground};
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${colors.hover};
+  }
+`;
+
+// Message audio
+export const MessageAudio = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: ${colors.messageBackground};
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${colors.hover};
+  }
+`;
+
+// Message location
+export const MessageLocation = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background-color: ${colors.messageBackground};
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${colors.hover};
+  }
+`;
+
+// Message contact
+export const MessageContact = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background-color: ${colors.messageBackground};
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${colors.hover};
+  }
+`;
+
+// Typing indicator
+export const TypingIndicator = styled.div`
+  max-width: 70%;
+  margin-bottom: 8px;
+  align-self: flex-start;
+  margin-left: 0;
+  margin-right: auto;
+  
+  .typing-dots {
+    display: flex;
+    gap: 2px;
+  }
+  
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    30% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
+`;
+
+// Message reactions
+export const MessageReactions = styled.div`
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  justify-content: flex-end;
+`;
+
+// Reaction button
+export const ReactionButton = styled.button`
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${colors.hover};
   }
 `;
 

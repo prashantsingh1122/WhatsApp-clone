@@ -8,7 +8,8 @@ import {
   LastMessage,
   ConversationMeta,
   MessageTime,
-  UnreadBadge
+  UnreadBadge,
+  OnlineIndicator
 } from './styles/Styles';
 
 const ConversationItemComponent = ({ contact, isActive, onClick }) => {
@@ -43,21 +44,52 @@ const ConversationItemComponent = ({ contact, isActive, onClick }) => {
       : message;
   };
 
+  const getMessagePreview = () => {
+    if (!contact.last_message_preview) return 'No messages yet';
+    
+    // Add message type indicators
+    let preview = contact.last_message_preview;
+    if (contact.last_message_type === 'image') {
+      preview = '📷 ' + preview;
+    } else if (contact.last_message_type === 'document') {
+      preview = '📄 ' + preview;
+    } else if (contact.last_message_type === 'audio') {
+      preview = '🎵 ' + preview;
+    } else if (contact.last_message_type === 'location') {
+      preview = '📍 ' + preview;
+    } else if (contact.last_message_type === 'contact') {
+      preview = '👤 ' + preview;
+    }
+    
+    return truncateMessage(preview);
+  };
+
+  const isOnline = () => {
+    // Simulate online status based on last activity
+    if (!contact.last_message_time) return false;
+    const lastActivity = moment(contact.last_message_time);
+    const now = moment();
+    return now.diff(lastActivity, 'minutes') < 5;
+  };
+
   return (
     <ConversationItem 
       isActive={isActive} 
       onClick={() => onClick(contact)}
     >
-      <Avatar>
-        {getInitials(contact.contact_name || contact.phone_number)}
-      </Avatar>
+      <div style={{ position: 'relative' }}>
+        <Avatar>
+          {getInitials(contact.contact_name || contact.phone_number)}
+        </Avatar>
+        {isOnline() && <OnlineIndicator />}
+      </div>
       
       <ConversationInfo>
         <ContactName>
           {contact.contact_name || contact.phone_number}
         </ContactName>
         <LastMessage>
-          {truncateMessage(contact.last_message_preview)}
+          {getMessagePreview()}
         </LastMessage>
       </ConversationInfo>
       

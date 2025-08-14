@@ -76,7 +76,14 @@ io.on('connection', (socket) => {
     socket.leave(`conversation_${wa_id}`);
     console.log(`Client ${socket.id} left conversation ${wa_id}`);
   });
-  
+
+  socket.on('typing', (data) => {
+    const { wa_id, isTyping } = data;
+    // Broadcast typing status to other users in the conversation
+    socket.to(`conversation_${wa_id}`).emit('typing', { wa_id, isTyping });
+    console.log(`User ${wa_id} is ${isTyping ? 'typing' : 'not typing'}`);
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });

@@ -1,35 +1,38 @@
 {
-  "name": "whatsapp-web-clone",
+  "name": "whatsapp-clone",
   "version": "1.0.0",
-  "description": "A full-stack WhatsApp Web clone with Node.js backend and React frontend",
+  "description": "A full-stack WhatsApp Web clone with real-time messaging",
   "main": "index.js",
   "scripts": {
     "setup": "npm run setup:backend && npm run setup:frontend",
     "setup:backend": "cd backend && npm install",
     "setup:frontend": "cd frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm start",
-    "start:backend": "cd backend && npm start",
-    "build:frontend": "cd frontend && npm run build",
+    "build": "cd frontend && npm run build",
     "seed": "cd backend && npm run seed",
-    "heroku-postbuild": "npm run setup:backend && npm run setup:frontend && npm run build:frontend"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/whatsapp-web-clone.git"
+    "process-real": "cd backend && npm run process-real",
+    "test-payloads": "cd backend && npm run test-payloads",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "keywords": [
     "whatsapp",
     "clone",
+    "real-time",
+    "messaging",
     "react",
     "nodejs",
     "mongodb",
-    "socket.io",
-    "realtime",
-    "messaging"
+    "socket.io"
   ],
   "author": "Your Name",
   "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"

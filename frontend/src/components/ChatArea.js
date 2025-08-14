@@ -15,7 +15,10 @@ import {
   SendButton,
   EmptyState,
   LoadingSpinner,
-  ErrorMessage
+  ErrorMessage,
+  TypingIndicator,
+  MessageReactions,
+  ReactionButton
 } from './styles/Styles';
 
 const ChatAreaComponent = ({ selectedContact, onBack }) => {
@@ -26,6 +29,8 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
   const [error, setError] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
   
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -33,6 +38,27 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
   // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Handle typing indicator
+  const handleTyping = () => {
+    if (!isTyping) {
+      setIsTyping(true);
+      socketService.emit('typing', { wa_id: selectedContact.wa_id, isTyping: true });
+    }
+    
+    // Clear existing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    
+    // Set new timeout
+    const timeout = setTimeout(() => {
+      setIsTyping(false);
+      socketService.emit('typing', { wa_id: selectedContact.wa_id, isTyping: false });
+    }, 2000);
+    
+    setTypingTimeout(timeout);
   };
 
   // Load messages for selected contact
@@ -70,6 +96,13 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
     const messageText = inputMessage.trim();
     setInputMessage(''); // Clear input immediately for better UX
     
+    // Clear typing indicator
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    setIsTyping(false);
+    socketService.emit('typing', { wa_id: selectedContact.wa_id, isTyping: false });
+    
     try {
       const newMessage = await messageService.sendMessage(
         selectedContact.wa_id,
@@ -96,9 +129,10 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
     }
   };
 
-  // Auto-resize textarea
+  // Auto-resize textarea and handle typing
   const handleInputChange = (e) => {
     setInputMessage(e.target.value);
+    handleTyping();
     
     // Auto-resize textarea
     e.target.style.height = 'auto';
@@ -156,10 +190,18 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
       }
     };
 
+    const handleTypingUpdate = (data) => {
+      if (data.wa_id === selectedContact?.wa_id) {
+        setIsTyping(data.isTyping);
+      }
+    };
+
     socketService.onMessageUpdate(handleMessageUpdate);
+    socketService.on('typing', handleTypingUpdate);
     
     return () => {
       socketService.offMessageUpdate();
+      socketService.off('typing');
     };
   }, [selectedContact]);
 
@@ -212,6 +254,11 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
           </ContactName>
           <div style={{ fontSize: '12px', color: '#8696A0' }}>
             {selectedContact.phone_number}
+            {isTyping && (
+              <span style={{ marginLeft: '8px', color: '#25D366' }}>
+                • typing
+              </span>
+            )}
           </div>
         </ContactInfo>
       </ChatHeader>
@@ -241,6 +288,19 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
             message={message}
           />
         ))}
+        
+        {isTyping && (
+          <TypingIndicator>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ fontSize: '12px', color: '#8696A0' }}>typing</div>
+              <div style={{ display: 'flex', gap: '2px' }}>
+                <div style={{ width: '4px', height: '4px', backgroundColor: '#8696A0', borderRadius: '50%', animation: 'typing 1.4s infinite' }}></div>
+                <div style={{ width: '4px', height: '4px', backgroundColor: '#8696A0', borderRadius: '50%', animation: 'typing 1.4s infinite 0.2s' }}></div>
+                <div style={{ width: '4px', height: '4px', backgroundColor: '#8696A0', borderRadius: '50%', animation: 'typing 1.4s infinite 0.4s' }}></div>
+              </div>
+            </div>
+          </TypingIndicator>
+        )}
         
         <div ref={messagesEndRef} />
       </MessagesContainer>
