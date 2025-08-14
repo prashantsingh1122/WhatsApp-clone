@@ -5,7 +5,7 @@ services:
     buildCommand: npm install
     startCommand: npm start
     plan: free
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,7 +17,7 @@ services:
       - key: MONGODB_URI
         sync: false # Set this in Render dashboard to your MongoDB Atlas connection string
       - key: CORS_ORIGIN
-        sync: false # Set this to your frontend URL (e.g., https://your-app.vercel.app)
+        value: "https://whatsapp-clonee-alpha.vercel.app,https://whatsapp-clonee-git-main-itsshivam135-gmailcoms-projects.vercel.app,https://whatsapp-clonee-ncarn3kik-itsshivam135-gmailcoms-projects.vercel.app"
       - key: WEBHOOK_VERIFY_TOKEN
         sync: false # Set this to your WhatsApp webhook verify token
       - key: JWT_SECRET
