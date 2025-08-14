@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { messageService } from '../services/api';
 import socketService from '../services/socket';
 import MessageBubbleComponent from './MessageBubble';
@@ -16,9 +16,7 @@ import {
   EmptyState,
   LoadingSpinner,
   ErrorMessage,
-  TypingIndicator,
-  MessageReactions,
-  ReactionButton
+  TypingIndicator
 } from './styles/Styles';
 
 const ChatAreaComponent = ({ selectedContact, onBack }) => {
@@ -62,7 +60,7 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
   };
 
   // Load messages for selected contact
-  const loadMessages = async (pageNum = 1, append = false) => {
+  const loadMessages = useCallback(async (pageNum = 1, append = false) => {
     if (!selectedContact) return;
     
     setIsLoading(true);
@@ -86,7 +84,7 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedContact]);
 
   // Send a new message
   const sendMessage = async () => {
@@ -154,7 +152,7 @@ const ChatAreaComponent = ({ selectedContact, onBack }) => {
         socketService.leaveConversation(selectedContact.wa_id);
       };
     }
-  }, [selectedContact]);
+  }, [selectedContact, loadMessages]);
 
   // Set up Socket.IO listeners for real-time updates
   useEffect(() => {
