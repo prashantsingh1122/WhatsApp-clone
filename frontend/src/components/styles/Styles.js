@@ -1,23 +1,28 @@
 import styled from 'styled-components';
 
-// Color palette based on WhatsApp Web dark theme
-export const colors = {
-  primary: '#075E54',
-  primaryLight: '#128C7E',
-  secondary: '#25D366',
-  background: '#111B21',
-  chatBackground: '#0B141A',
-  sidebarBackground: '#202C33',
-  messageBackground: '#182229',
-  incomingMessage: '#202C33',
-  outgoingMessage: '#005C4B',
-  text: '#E9EDEF',
-  textSecondary: '#8696A0',
-  textMuted: '#667781',
-  border: '#8696A026',
-  searchBackground: '#202C33',
-  hover: '#2A3942',
-  active: '#2A3942'
+// WhatsApp Web Colors
+const colors = {
+  primary: '#00a884', // WhatsApp green
+  secondary: '#667781', // Secondary text
+  background: '#ffffff', // Main background
+  sidebar: '#ffffff', // Sidebar background
+  chatBackground: '#efeae2', // Chat background (default)
+  messageOut: '#d9fdd3', // Outgoing message bubble
+  messageIn: '#ffffff', // Incoming message bubble
+  header: '#f0f2f5', // Header background
+  border: '#e9edef', // Border color
+  icon: '#54656f', // Icon color
+  link: '#00a884', // Link color
+  error: '#ff6b6b', // Error color
+  success: '#25d366', // Success color
+  typing: '#8696a0', // Typing indicator
+  unread: '#25d366', // Unread indicator
+  timestamp: '#667781', // Timestamp color
+  status: {
+    sent: '#8696a0',
+    delivered: '#53bdeb',
+    read: '#34b7f1'
+  }
 };
 
 // Main container
@@ -25,555 +30,649 @@ export const AppContainer = styled.div`
   display: flex;
   height: 100vh;
   width: 100vw;
-  background-color: ${colors.background};
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: ${colors.text};
+  background: ${colors.background};
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #111b21;
 `;
 
-// Sidebar (conversations list)
+// Sidebar styles
 export const Sidebar = styled.div`
-  width: 30%;
-  min-width: 300px;
-  max-width: 400px;
-  background-color: ${colors.sidebarBackground};
+  width: 400px;
+  height: 100vh;
+  background: ${colors.sidebar};
   border-right: 1px solid ${colors.border};
   display: flex;
   flex-direction: column;
-  
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+
   @media (max-width: 768px) {
     width: 100%;
-    max-width: 100%;
     display: ${props => props.isOpen ? 'flex' : 'none'};
   }
 `;
 
-// Sidebar header
 export const SidebarHeader = styled.div`
-  padding: 16px;
-  background-color: ${colors.sidebarBackground};
-  border-bottom: 1px solid ${colors.border};
+  height: 60px;
+  background: ${colors.header};
   display: flex;
   align-items: center;
-  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid ${colors.border};
+  position: relative;
 `;
 
-// Search bar
-export const SearchBar = styled.input`
+export const HeaderTitle = styled.h1`
+  font-size: 16px;
+  font-weight: 600;
+  color: #111b21;
+  margin-left: 12px;
+`;
+
+export const SearchContainer = styled.div`
+  padding: 8px 12px;
+  background: ${colors.background};
+  border-bottom: 1px solid ${colors.border};
+  position: relative;
+`;
+
+export const SearchInput = styled.input`
   width: 100%;
-  padding: 12px 16px;
-  margin: 8px 16px;
-  background-color: ${colors.searchBackground};
+  padding: 8px 12px 8px 36px;
   border: none;
   border-radius: 8px;
-  color: ${colors.text};
-  font-size: 14px;
+  background: ${colors.header};
+  font-size: 15px;
+  color: #111b21;
   outline: none;
-  
+
   &::placeholder {
-    color: ${colors.textMuted};
+    color: ${colors.secondary};
   }
-  
+
   &:focus {
-    background-color: ${colors.hover};
+    background: ${colors.background};
   }
 `;
 
-// Conversations list
+export const SearchIcon = styled.div`
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${colors.secondary};
+  font-size: 16px;
+`;
+
 export const ConversationsList = styled.div`
   flex: 1;
   overflow-y: auto;
-  
+  background: ${colors.background};
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background: ${colors.textMuted};
+    background: #cccccc;
     border-radius: 3px;
   }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999999;
+  }
 `;
 
-// Individual conversation item
+// Conversation item styles
 export const ConversationItem = styled.div`
-  padding: 16px;
-  border-bottom: 1px solid ${colors.border};
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: ${props => props.isActive ? colors.active : 'transparent'};
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-  
   display: flex;
   align-items: center;
-  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid ${colors.border};
+  position: relative;
+
+  &:hover {
+    background: ${colors.header};
+  }
+
+  &.active {
+    background: ${colors.header};
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
-// Avatar for contacts
-export const Avatar = styled.div`
-  width: 48px;
-  height: 48px;
+export const ConversationAvatar = styled.div`
+  width: 49px;
+  height: 49px;
   border-radius: 50%;
-  background-color: ${colors.primary};
+  background: ${colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: 600;
   font-size: 18px;
+  margin-right: 15px;
   flex-shrink: 0;
-  
-  ${props => props.size === 'small' && `
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  `}
+  position: relative;
 `;
 
-// Conversation info
-export const ConversationInfo = styled.div`
-  flex: 1;
-  min-width: 0;
-`;
-
-// Contact name
-export const ContactName = styled.div`
-  font-weight: 500;
-  color: ${colors.text};
-  margin-bottom: 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-// Last message preview
-export const LastMessage = styled.div`
-  color: ${colors.textSecondary};
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-// Conversation meta (time, unread count)
-export const ConversationMeta = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-`;
-
-// Message time
-export const MessageTime = styled.div`
-  color: ${colors.textMuted};
-  font-size: 12px;
-`;
-
-// Unread count badge
-export const UnreadBadge = styled.div`
-  background-color: ${colors.secondary};
-  color: white;
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  min-width: 20px;
-  text-align: center;
-  display: ${props => props.count > 0 ? 'block' : 'none'};
-`;
-
-// Online indicator
 export const OnlineIndicator = styled.div`
   position: absolute;
   bottom: 2px;
   right: 2px;
   width: 12px;
   height: 12px;
-  background-color: ${colors.secondary};
-  border: 2px solid ${colors.sidebarBackground};
+  background: ${colors.unread};
+  border: 2px solid ${colors.background};
   border-radius: 50%;
 `;
 
-// Main chat area
+export const ConversationContent = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+export const ConversationHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+`;
+
+export const ConversationName = styled.div`
+  font-weight: 600;
+  font-size: 16px;
+  color: #111b21;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const ConversationTime = styled.div`
+  font-size: 12px;
+  color: ${colors.timestamp};
+  white-space: nowrap;
+  margin-left: 8px;
+`;
+
+export const ConversationPreview = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: ${colors.secondary};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const MessageTypeIcon = styled.span`
+  margin-right: 4px;
+  font-size: 16px;
+`;
+
+export const UnreadBadge = styled.div`
+  background: ${colors.unread};
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  flex-shrink: 0;
+`;
+
+// Chat area styles
 export const ChatArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: ${colors.chatBackground};
+  background: ${colors.chatBackground};
   position: relative;
-  
+
   @media (max-width: 768px) {
     display: ${props => props.isOpen ? 'flex' : 'none'};
-    width: 100%;
   }
 `;
 
-// Chat header
 export const ChatHeader = styled.div`
-  padding: 16px;
-  background-color: ${colors.sidebarBackground};
-  border-bottom: 1px solid ${colors.border};
+  height: 60px;
+  background: ${colors.header};
   display: flex;
   align-items: center;
-  gap: 12px;
-  
-  @media (max-width: 768px) {
-    padding: 12px 16px;
-  }
+  padding: 0 16px;
+  border-bottom: 1px solid ${colors.border};
+  position: relative;
 `;
 
-// Back button for mobile
 export const BackButton = styled.button`
-  display: none;
   background: none;
   border: none;
-  color: ${colors.text};
+  font-size: 20px;
+  color: ${colors.icon};
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-  
+  margin-right: 12px;
+  display: none;
+
   @media (max-width: 768px) {
     display: block;
   }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
 `;
 
-// Contact info in header
 export const ContactInfo = styled.div`
   flex: 1;
+  display: flex;
+  flex-direction: column;
 `;
 
-// Chat messages container
+export const ContactName = styled.div`
+  font-weight: 600;
+  font-size: 16px;
+  color: #111b21;
+`;
+
+export const ContactStatus = styled.div`
+  font-size: 13px;
+  color: ${colors.secondary};
+`;
+
+export const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const HeaderButton = styled.button`
+  background: none;
+  border: none;
+  color: ${colors.icon};
+  font-size: 18px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+`;
+
+// Messages container
 export const MessagesContainer = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-  
+  padding: 20px 0;
+  background: ${colors.chatBackground};
+  position: relative;
+
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background: ${colors.textMuted};
+    background: #cccccc;
     border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #999999;
   }
 `;
 
-// Individual message bubble
-export const MessageBubble = styled.div`
-  max-width: 70%;
+export const MessageGroup = styled.div`
   margin-bottom: 8px;
-  align-self: ${props => props.isOutgoing ? 'flex-end' : 'flex-start'};
-  margin-left: ${props => props.isOutgoing ? 'auto' : '0'};
-  margin-right: ${props => props.isOutgoing ? '0' : 'auto'};
+  animation: fadeIn 0.3s ease;
 `;
 
-// Message content
-export const MessageContent = styled.div`
-  background-color: ${props => props.isOutgoing ? colors.outgoingMessage : colors.incomingMessage};
-  padding: 8px 12px;
+export const MessageDate = styled.div`
+  text-align: center;
+  margin: 16px 0;
+  font-size: 12px;
+  color: ${colors.secondary};
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 12px;
   border-radius: 8px;
+  display: inline-block;
+  margin-left: 50%;
+  transform: translateX(-50%);
+`;
+
+// Message bubble styles
+export const MessageBubble = styled.div`
+  max-width: 65%;
+  margin: 2px 0;
+  padding: 6px 7px 8px 9px;
+  border-radius: 7.5px;
   position: relative;
   word-wrap: break-word;
-  
+  animation: fadeIn 0.3s ease;
+
   ${props => props.isOutgoing ? `
-    border-bottom-right-radius: 2px;
+    background: ${colors.messageOut};
+    margin-left: auto;
+    margin-right: 16px;
+    border-top-right-radius: 0;
   ` : `
-    border-bottom-left-radius: 2px;
+    background: ${colors.messageIn};
+    margin-left: 16px;
+    margin-right: auto;
+    border-top-left-radius: 0;
   `}
 `;
 
-// Message text
-export const MessageText = styled.div`
-  color: ${colors.text};
+export const MessageContent = styled.div`
   font-size: 14px;
-  line-height: 1.4;
-  margin-bottom: 4px;
+  line-height: 19px;
+  color: #111b21;
+  margin-bottom: ${props => props.hasStatus ? '4px' : '0'};
 `;
 
-// Message footer (time and status)
-export const MessageFooter = styled.div`
+export const MessageStatus = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
   justify-content: flex-end;
-  margin-top: 4px;
-`;
-
-// Message timestamp
-export const MessageTimestamp = styled.span`
-  color: ${colors.textMuted};
+  gap: 4px;
   font-size: 11px;
+  color: ${colors.timestamp};
 `;
 
-// Message status indicator
-export const MessageStatus = styled.span`
+export const StatusIcon = styled.span`
+  font-size: 14px;
   color: ${props => {
-    switch (props.status) {
-      case 'sent': return colors.textMuted;
-      case 'delivered': return colors.textMuted;
-      case 'read': return colors.secondary;
-      default: return colors.textMuted;
-    }
+    if (props.status === 'read') return colors.status.read;
+    if (props.status === 'delivered') return colors.status.delivered;
+    return colors.status.sent;
   }};
-  font-size: 12px;
-  
-  &::after {
-    content: ${props => {
-      switch (props.status) {
-        case 'sent': return '"✓"';
-        case 'delivered': return '"✓✓"';
-        case 'read': return '"✓✓"';
-        default: return '""';
-      }
-    }};
-  }
 `;
 
-// Message image
-export const MessageImage = styled.img`
-  max-width: 100%;
-  max-height: 300px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
-// Message document
-export const MessageDocument = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  background-color: ${colors.messageBackground};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-`;
-
-// Message audio
-export const MessageAudio = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  background-color: ${colors.messageBackground};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-`;
-
-// Message location
-export const MessageLocation = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  background-color: ${colors.messageBackground};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-`;
-
-// Message contact
-export const MessageContact = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  background-color: ${colors.messageBackground};
-  border-radius: 8px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
-`;
-
-// Typing indicator
-export const TypingIndicator = styled.div`
-  max-width: 70%;
-  margin-bottom: 8px;
-  align-self: flex-start;
-  margin-left: 0;
-  margin-right: auto;
-  
-  .typing-dots {
-    display: flex;
-    gap: 2px;
-  }
-  
-  @keyframes typing {
-    0%, 60%, 100% {
-      transform: translateY(0);
-      opacity: 0.4;
-    }
-    30% {
-      transform: translateY(-4px);
-      opacity: 1;
-    }
-  }
-`;
-
-// Message reactions
-export const MessageReactions = styled.div`
-  display: flex;
-  gap: 4px;
-  margin-top: 4px;
-  justify-content: flex-end;
-`;
-
-// Reaction button
-export const ReactionButton = styled.button`
-  background: none;
-  border: none;
-  padding: 2px 6px;
-  border-radius: 12px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: ${colors.hover};
-  }
+export const MessageTime = styled.span`
+  font-size: 11px;
+  color: ${colors.timestamp};
 `;
 
 // Message input area
 export const MessageInputArea = styled.div`
-  padding: 16px;
-  background-color: ${colors.sidebarBackground};
+  background: ${colors.background};
   border-top: 1px solid ${colors.border};
+  padding: 10px 16px;
   display: flex;
   align-items: flex-end;
-  gap: 12px;
+  gap: 8px;
+  min-height: 62px;
 `;
 
-// Message input field
 export const MessageInput = styled.textarea`
   flex: 1;
-  background-color: ${colors.searchBackground};
   border: none;
-  border-radius: 20px;
-  padding: 12px 16px;
-  color: ${colors.text};
-  font-size: 14px;
-  font-family: inherit;
-  resize: none;
-  max-height: 120px;
-  min-height: 44px;
   outline: none;
-  
+  resize: none;
+  font-size: 15px;
+  line-height: 20px;
+  max-height: 100px;
+  min-height: 20px;
+  padding: 9px 12px;
+  background: ${colors.header};
+  border-radius: 8px;
+  color: #111b21;
+  font-family: inherit;
+
   &::placeholder {
-    color: ${colors.textMuted};
+    color: ${colors.secondary};
   }
-  
+
   &:focus {
-    background-color: ${colors.hover};
+    background: ${colors.background};
   }
 `;
 
-// Send button
 export const SendButton = styled.button`
-  background-color: ${colors.secondary};
+  background: ${props => props.disabled ? colors.secondary : colors.primary};
+  color: white;
   border: none;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  color: white;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  transition: all 0.2s ease;
   font-size: 18px;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: #1eb757;
+
+  &:hover:not(:disabled) {
+    background: ${props => props.disabled ? colors.secondary : '#008f72'};
+    transform: scale(1.05);
   }
-  
-  &:disabled {
-    background-color: ${colors.textMuted};
-    cursor: not-allowed;
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
   }
 `;
 
 // Empty state
 export const EmptyState = styled.div`
-  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  color: ${colors.textMuted};
+  height: 100%;
+  color: ${colors.secondary};
   text-align: center;
-  gap: 16px;
+  padding: 40px;
+
+  h2 {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: #111b21;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
 
-// Loading spinner
+// Loading and error states
 export const LoadingSpinner = styled.div`
   width: 24px;
   height: 24px;
   border: 2px solid ${colors.border};
-  border-top: 2px solid ${colors.secondary};
+  border-top: 2px solid ${colors.primary};
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
 `;
 
-// Error message
 export const ErrorMessage = styled.div`
-  background-color: #ff4444;
+  background: ${colors.error};
   color: white;
   padding: 12px 16px;
-  margin: 8px 16px;
   border-radius: 8px;
+  margin: 16px;
   font-size: 14px;
+  text-align: center;
 `;
 
-// Success message
-export const SuccessMessage = styled.div`
-  background-color: ${colors.secondary};
+// Typing indicator
+export const TypingIndicator = styled.div`
+  padding: 8px 16px;
+  color: ${colors.typing};
+  font-size: 12px;
+  font-style: italic;
+  animation: fadeIn 0.3s ease;
+`;
+
+// Message media styles
+export const MessageImage = styled.img`
+  max-width: 100%;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+export const MessageDocument = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  cursor: pointer;
+
+  .icon {
+    font-size: 24px;
+    margin-right: 8px;
+  }
+
+  .info {
+    flex: 1;
+  }
+
+  .name {
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .size {
+    font-size: 11px;
+    color: ${colors.secondary};
+  }
+`;
+
+export const MessageAudio = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  cursor: pointer;
+
+  .play-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: ${colors.primary};
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .waveform {
+    flex: 1;
+    height: 20px;
+    background: linear-gradient(90deg, ${colors.primary} 0%, ${colors.primary} 30%, ${colors.border} 30%, ${colors.border} 100%);
+    border-radius: 10px;
+  }
+`;
+
+export const MessageLocation = styled.div`
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  cursor: pointer;
+
+  .icon {
+    font-size: 24px;
+    color: ${colors.primary};
+    margin-bottom: 4px;
+  }
+
+  .text {
+    font-size: 12px;
+    font-weight: 600;
+  }
+`;
+
+export const MessageContact = styled.div`
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  cursor: pointer;
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: ${colors.primary};
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .phone {
+    font-size: 11px;
+    color: ${colors.secondary};
+  }
+`;
+
+// Responsive design
+export const MobileOverlay = styled.div`
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 5;
+    display: ${props => props.isOpen ? 'block' : 'none'};
+  }
+`;
+
+// Avatar component
+export const Avatar = styled.div`
+  width: ${props => props.size === 'small' ? '40px' : '49px'};
+  height: ${props => props.size === 'small' ? '40px' : '49px'};
+  border-radius: 50%;
+  background: ${colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: white;
-  padding: 12px 16px;
-  margin: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: ${props => props.size === 'small' ? '16px' : '18px'};
+  flex-shrink: 0;
+  position: relative;
 `;

@@ -2,17 +2,18 @@ import React from 'react';
 import moment from 'moment';
 import {
   ConversationItem,
-  Avatar,
-  ConversationInfo,
-  ContactName,
-  LastMessage,
-  ConversationMeta,
-  MessageTime,
-  UnreadBadge,
-  OnlineIndicator
+  ConversationAvatar,
+  OnlineIndicator,
+  ConversationContent,
+  ConversationHeader,
+  ConversationName,
+  ConversationTime,
+  ConversationPreview,
+  MessageTypeIcon,
+  UnreadBadge
 } from './styles/Styles';
 
-const ConversationItemComponent = ({ contact, isActive, onClick }) => {
+const ConversationItemComponent = ({ conversation, isActive, onClick }) => {
   const getInitials = (name) => {
     if (!name) return '?';
     return name.split(' ')
@@ -23,84 +24,73 @@ const ConversationItemComponent = ({ contact, isActive, onClick }) => {
   };
 
   const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    
     const now = moment();
     const messageTime = moment(timestamp);
     
-    if (now.diff(messageTime, 'days') === 0) {
+    if (now.isSame(messageTime, 'day')) {
       return messageTime.format('HH:mm');
     } else if (now.diff(messageTime, 'days') === 1) {
-      return 'Yesterday';
+      return 'yesterday';
     } else if (now.diff(messageTime, 'days') < 7) {
-      return messageTime.format('dddd');
+      return messageTime.format('ddd');
     } else {
-      return messageTime.format('DD/MM/YYYY');
+      return messageTime.format('DD/MM/YY');
     }
-  };
-
-  const truncateMessage = (message, maxLength = 30) => {
-    if (!message) return 'No messages yet';
-    return message.length > maxLength 
-      ? `${message.substring(0, maxLength)}...` 
-      : message;
   };
 
   const getMessagePreview = () => {
-    if (!contact.last_message_preview) return 'No messages yet';
+    if (!conversation.last_message_preview) return '';
     
-    // Add message type indicators
-    let preview = contact.last_message_preview;
-    if (contact.last_message_type === 'image') {
-      preview = '📷 ' + preview;
-    } else if (contact.last_message_type === 'document') {
-      preview = '📄 ' + preview;
-    } else if (contact.last_message_type === 'audio') {
-      preview = '🎵 ' + preview;
-    } else if (contact.last_message_type === 'location') {
-      preview = '📍 ' + preview;
-    } else if (contact.last_message_type === 'contact') {
-      preview = '👤 ' + preview;
-    }
+    const type = conversation.last_message_type || 'text';
+    const icon = {
+      text: '',
+      image: '🖼️',
+      document: '📄',
+      audio: '🎵',
+      location: '📍',
+      contact: '👤'
+    }[type] || '';
     
-    return truncateMessage(preview);
+    return `${icon} ${conversation.last_message_preview}`;
   };
 
   const isOnline = () => {
-    // Simulate online status based on last activity
-    if (!contact.last_message_time) return false;
-    const lastActivity = moment(contact.last_message_time);
-    const now = moment();
-    return now.diff(lastActivity, 'minutes') < 5;
+    // Simulate online status - in real app, this would come from user status
+    return Math.random() > 0.7;
   };
 
   return (
     <ConversationItem 
-      isActive={isActive} 
-      onClick={() => onClick(contact)}
+      className={isActive ? 'active' : ''}
+      onClick={onClick}
     >
-      <div style={{ position: 'relative' }}>
-        <Avatar>
-          {getInitials(contact.contact_name || contact.phone_number)}
-        </Avatar>
+      <ConversationAvatar>
+        {getInitials(conversation.contact_name || conversation.phone_number)}
         {isOnline() && <OnlineIndicator />}
-      </div>
+      </ConversationAvatar>
       
-      <ConversationInfo>
-        <ContactName>
-          {contact.contact_name || contact.phone_number}
-        </ContactName>
-        <LastMessage>
+      <ConversationContent>
+        <ConversationHeader>
+          <ConversationName>
+            {conversation.contact_name || conversation.phone_number}
+          </ConversationName>
+          <ConversationTime>
+            {formatTime(conversation.last_message_time)}
+          </ConversationTime>
+        </ConversationHeader>
+        
+        <ConversationPreview>
           {getMessagePreview()}
-        </LastMessage>
-      </ConversationInfo>
+        </ConversationPreview>
+      </ConversationContent>
       
-      <ConversationMeta>
-        <MessageTime>
-          {formatTime(contact.last_message_time)}
-        </MessageTime>
-        <UnreadBadge count={contact.unread_count}>
-          {contact.unread_count}
+      {conversation.unread_count > 0 && (
+        <UnreadBadge>
+          {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
         </UnreadBadge>
-      </ConversationMeta>
+      )}
     </ConversationItem>
   );
 };
