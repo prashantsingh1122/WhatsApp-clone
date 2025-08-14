@@ -12,17 +12,29 @@ const app = express();
 const server = http.createServer(app);
 
 // CORS configuration
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || [
+const getCorsOrigins = () => {
+  if (process.env.CORS_ORIGIN) {
+    return process.env.CORS_ORIGIN.split(',').map(origin => origin.trim());
+  }
+  return [
     "http://localhost:3000", 
     "http://127.0.0.1:3000",
     "https://whatsapp-clonee-alpha.vercel.app",
     "https://whatsapp-clonee-git-main-itsshivam135-gmailcoms-projects.vercel.app",
     "https://whatsapp-clonee-ncarn3kik-itsshivam135-gmailcoms-projects.vercel.app"
-  ],
+  ];
+};
+
+const corsOptions = {
+  origin: getCorsOrigins(),
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 };
+
+// Debug CORS configuration
+console.log('🌐 CORS Origins:', getCorsOrigins());
+console.log('🔧 Environment:', process.env.NODE_ENV);
+console.log('📡 CORS_ORIGIN env var:', process.env.CORS_ORIGIN);
 
 app.use(cors(corsOptions));
 
