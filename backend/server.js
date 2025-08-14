@@ -13,7 +13,13 @@ const server = http.createServer(app);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || ["http://localhost:3000", "http://127.0.0.1:3000"],
+  origin: process.env.CORS_ORIGIN || [
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+    "https://whatsapp-clonee-alpha.vercel.app",
+    "https://whatsapp-clonee-git-main-itsshivam135-gmailcoms-projects.vercel.app",
+    "https://whatsapp-clonee-ncarn3kik-itsshivam135-gmailcoms-projects.vercel.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 };
